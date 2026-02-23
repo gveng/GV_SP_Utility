@@ -60,6 +60,27 @@ namespace WpfApp
             }
         }
 
+        private void MenuItem_CloseAllFiles(object sender, RoutedEventArgs e)
+        {
+            if (_loadedFiles.Count == 0) return;
+
+            if (MessageBox.Show("Are you sure you want to close all files and clear data?", "Confirm Close", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                _loadedFiles.Clear();
+                TablesMenu.Items.Clear();
+                
+                // Close any open child windows (Graphs, Tables, TDR)
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window != this)
+                    {
+                        window.Close();
+                    }
+                }
+            }
+        }
+
+
         private void MenuItem_Exit(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
@@ -183,10 +204,24 @@ namespace WpfApp
             var magnitudeItem = new MenuItem { Header = "Mostra magnitudini" };
             magnitudeItem.Click += (_, _) => ShowMagnitudeTab(file);
 
+            var closeItem = new MenuItem { Header = "Chiudi File" };
+            closeItem.Click += (_, _) => CloseFile(file, parent);
+
             parent.Items.Add(dataItem);
             parent.Items.Add(magnitudeItem);
+            parent.Items.Add(new Separator());
+            parent.Items.Add(closeItem);
 
             TablesMenu.Items.Add(parent);
+        }
+
+        private void CloseFile(TouchstoneFileData file, MenuItem menuItem)
+        {
+            if (MessageBox.Show($"Are you sure you want to close '{file.FileName}'?", "Confirm Close", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                _loadedFiles.Remove(file);
+                TablesMenu.Items.Remove(menuItem);
+            }
         }
 
         private void ShowDataTab(TouchstoneFileData file)

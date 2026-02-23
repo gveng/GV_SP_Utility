@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Numerics;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -121,9 +122,8 @@ namespace WpfApp
 
             model.IsLegendVisible = false;
 
-            bool isDb = MagDbRadio.IsChecked == true;
-            string yTitle = isDb ? "Amplitude (dB)" : "Amplitude (Linear)";
-
+            string yTitle = "Amplitude (dB)";
+            
             Axis xAxis = _settings.IsXLog
                 ? new LogarithmicAxis { Position = AxisPosition.Bottom, Title = "Frequency (Hz)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot }
                 : new LinearAxis { Position = AxisPosition.Bottom, Title = "Frequency (Hz)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot, StringFormat = "0.###E+0" };
@@ -167,11 +167,7 @@ namespace WpfApp
 
                 foreach (var point in sel.File.Points)
                 {
-                    double val = point.Parameters[paramIndex].Magnitude;
-                    if (isDb)
-                    {
-                        val = ToDb(val);
-                    }
+                    double val = ToDb(point.Parameters[paramIndex].Magnitude);
                     series.Points.Add(new DataPoint(point.FrequencyHz, val));
                 }
 
@@ -209,6 +205,38 @@ namespace WpfApp
             _lastSelection = selected;
             EmptyChartLabel.Visibility = Visibility.Collapsed;
             DrawChart(selected);
+        }
+
+        private static double CalculateComplexImpedanceMagnitude(TouchstoneParameterValue param, double systemImpedance)
+        {
+            var complexParam = new Complex(param.Real, param.Imaginary);
+            Complex complexZ;
+
+            // Determine calculation method based on parameter name
+            // S11/S22 -> Reflection Method (1-port)
+            // S21/S12 -> Series-Thru Method (2-port series component)
+            bool isTransmission = param.Name.Contains("S21", StringComparison.OrdinalIgnoreCase) || 
+                                  param.Name.Contains("S12", StringComparison.OrdinalIgnoreCase);
+
+            if (isTransmission)
+            {
+                // Series-Thru Method for Series Component (e.g., Capacitor in series)
+                // Z = 2 * Z0 * (1 - S21) / S21
+                complexZ = 2 * systemImpedance * (1 - complexParam) / complexParam;
+            }
+            else
+            {
+                // Reflection Method (1-port Z)
+                // Z = Z0 * (1 + S11) / (1 - S11)
+                complexZ = systemImpedance * (1 + complexParam) / (1 - complexParam);
+            }
+            
+            // Extract Real and Imaginary parts
+            double realPart = complexZ.Real;
+            double imaginaryPart = complexZ.Imaginary;
+
+            // Calculate Magnitude from Real and Imaginary parts: |Z| = Sqrt(Re^2 + Im^2)
+            return Math.Sqrt(realPart * realPart + imaginaryPart * imaginaryPart);
         }
 
         private List<(TouchstoneFileData File, string Param, string FileName)> GetCurrentSelection()

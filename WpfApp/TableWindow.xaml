@@ -2,7 +2,17 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Data Tables" Height="500" Width="900">
-    <Grid>
-        <ContentPresenter x:Name="ContentHost" />
-    </Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#f0f0f0" Padding="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="Export to E_xcel (CSV)..." Click="ExportToCsv_Click"/>
+                <MenuItem Header="Export to Excel (_XLSX)..." Click="ExportToExcel_Click"/>
+                <Separator/>
+                <MenuItem Header="_Close" Click="Close_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <ContentPresenter x:Name="ContentHost" />
+        </Grid>
+    </DockPanel>
 </Window>

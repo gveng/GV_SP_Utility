@@ -6,6 +6,7 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open File..." Click="MenuItem_OpenFile" />
+                <MenuItem Header="Close All Files" Click="MenuItem_CloseAllFiles" />
                 <Separator />
                 <MenuItem Header="Exit" Click="MenuItem_Exit" />
             </MenuItem>
