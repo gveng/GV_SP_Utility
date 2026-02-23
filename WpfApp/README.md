@@ -14,12 +14,14 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
 
 ### Visualizzazione Dati
 - **Tabelle Dati**: Visualizzazione tabellare dettagliata per ogni file caricato, accessibile dal menu `Tabelle`.
+    - **Esportazione Excel**: Possibilità di esportare i dati in formato CSV o Excel nativo (`.xlsx`).
 - **Dati Calcolati**: Conversione automatica e visualizzazione di Magnitudine (lineare e dB), Fase (gradi), Parte Reale e Immaginaria.
 
 ### Grafici (Plotting)
 - **Menu Grafici**: Accesso a grafici nel dominio della frequenza e nel dominio del tempo (TDR).
   - **Dominio della Frequenza**: Confronto di parametri S.
     - **Visualizzazione**: Magnitudine (dB o Lineare) vs Frequenza.
+    - **Impedenza**: Calcolo e plot del modulo dell'impedenza ($|Z|$). Supporto automatico per metodo Riflessione ($S_{11}$) e metodo Series-Thru ($S_{21}$).
     - **Controllo Assi**: Scala Lineare o Logaritmica per entrambi gli assi X e Y.
     - Selezione Multipla e sovrapposizione curve.
     - Zoom e Pan interattivi.
@@ -68,6 +70,7 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
 ## Dipendenze
 
 - **OxyPlot.Wpf**: Libreria per la generazione dei grafici.
+- **ClosedXML**: Libreria per la gestione dei file Excel (.xlsx).
 
 ## Note Tecniche
 

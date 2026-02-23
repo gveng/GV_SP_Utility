@@ -22,4 +22,4 @@ Aggiorna il file copilot-instructions.md nella directory .github direttamente ma
 - [x] Avvia il progetto
 - [x] Assicurati che la documentazione sia completa
 
-Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati/magnitudini, finestra grafici con scala Lineare/Logaritmica e Magnitudine dB/Lineare. Documentazione aggiornata in README.md.
+Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati con export Excel/CSV, finestra grafici con scala Lin/Log e calcolo impedenza (S11/S21), gestione chiusura file. Documentazione aggiornata in README.md.
