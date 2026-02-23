@@ -12,6 +12,25 @@
 			"isBackground": false,
 			"problemMatcher": [],
 			"group": "build"
+		},
+		{
+			"label": "Pubblica Release (SingleFile)",
+			"type": "shell",
+			"command": "dotnet publish",
+			"args": [
+				"WpfApp",
+				"-c",
+				"Release",
+				"-r",
+				"win-x64",
+				"--self-contained",
+				"true",
+				"-p:PublishSingleFile=true",
+				"-o",
+				"Publish/SingleFile"
+			],
+			"group": "build",
+			"problemMatcher": []
 		}
 	]
 }

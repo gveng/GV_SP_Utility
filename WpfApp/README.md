@@ -40,18 +40,22 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
 - **Framework**: .NET 8.0 (Windows)
 - **Sistema Operativo**: Windows 10/11
 
-## Istruzioni per l'Uso
+## Installazione
 
-1. **Avvio**:
-   - Aprire la soluzione in Visual Studio o VS Code.
-   - Eseguire il progetto `WpfApp`.
-   - Alternativamente, da riga di comando: `dotnet run --project ./WpfApp`
+### Versione Portatile
+L'applicazione è distribuita come singolo eseguibile portatile (`.exe`). Non richiede installazione.
+Scaricare il file `GV_SP_Utility_v1.1.0_Portable.zip`, estrarlo ed eseguire `WpfApp.exe`.
 
-2. **Caricamento Dati**:
+### Creazione Installer (Opzionale)
+Per generare un installer standard di Windows (`setup.exe`):
+1. Installare [Inno Setup](https://jrsoftware.org/isdl.php).
+2. Aprire il file `WpfApp_InnoSetup.iss` presente nella root del progetto.
+3. Compilare lo script (Build -> Compile).
+4. L'installer verrà generato nella cartella `Publish/Installer`.
    - Menu `File` -> `Apri File...` per selezionare i file `.s2p`, `.s1p`, ecc.
 
 3. **Grafici**:
-   - **Frequenza**: Menu `Grafici` -> `Apri Freuency Domain`.
+   - **Frequenza**: Menu `Grafici` -> `Apri Frequency Domain`.
    - **TDR**: Menu `Grafici` -> `Apri Time Domain (TDR)`.
      - Selezionare il parametro desiderato (es. $S_{11}$, $S_{22}$) dal pannello laterale.
      - Impostare Rise Time e altri parametri (es. Windowing).

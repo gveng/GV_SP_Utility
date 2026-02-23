@@ -1,18 +1,5 @@
-- [ ] Verifica che il file copilot-instructions.md nella directory .github sia creato.
-
-- [ ] Chiarisci i requisiti del progetto
-- [ ] Crea la struttura del progetto
-- [ ] Personalizza il progetto
-- [ ] Installa le estensioni richieste
-- [ ] Compila il progetto
-- [ ] Crea ed esegui un task
-- [ ] Avvia il progetto
-- [ ] Assicurati che la documentazione sia completa
-
-Segui sistematicamente ogni punto della lista.
-Aggiorna il file copilot-instructions.md nella directory .github direttamente man mano che completi ogni passaggio.
-
 - [x] Verifica che il file copilot-instructions.md nella directory .github sia creato.
+
 - [x] Chiarisci i requisiti del progetto
 - [x] Crea la struttura del progetto
 - [x] Personalizza il progetto
@@ -22,4 +9,7 @@ Aggiorna il file copilot-instructions.md nella directory .github direttamente ma
 - [x] Avvia il progetto
 - [x] Assicurati che la documentazione sia completa
 
-Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati con export Excel/CSV, finestra grafici con scala Lin/Log e calcolo impedenza (S11/S21), gestione chiusura file. Documentazione aggiornata in README.md.
+Segui sistematicamente ogni punto della lista.
+Aggiorna il file copilot-instructions.md nella directory .github direttamente man mano che completi ogni passaggio.
+
+Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati Excel, grafici avanzati (Impedenza), e pacchetto portatile ZIP creato. Include lo script Inno Setup per la creazione dell'installer. Documentazione aggiornata in README.md.
