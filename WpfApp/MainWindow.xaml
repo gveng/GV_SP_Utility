@@ -1,0 +1,27 @@
+<Window x:Class="WpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WPF Utility" Height="600" Width="1000">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Apri File" Click="MenuItem_OpenFile" />
+                <Separator />
+                <MenuItem Header="Chiudi applicazione" Click="MenuItem_Exit" />
+            </MenuItem>
+            <MenuItem Header="Tabelle" x:Name="TablesMenu" />
+            <MenuItem Header="Grafici">
+                <MenuItem Header="Apri finestra grafici" Click="MenuItem_OpenCharts" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="12">
+                <StackPanel>
+                    <TextBlock Text="Carica file Touchstone dal menu File → Apri File." FontSize="16" Margin="0 0 0 8" />
+                    <TextBlock Text="Apri tabelle dal menu Tabelle: ogni tabella si apre in una finestra separata e chiudibile." TextWrapping="Wrap" />
+                    <TextBlock Text="Apri la finestra Grafici dal menu Grafici." TextWrapping="Wrap" Margin="0 6 0 0" />
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>
