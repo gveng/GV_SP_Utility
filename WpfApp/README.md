@@ -1,26 +1,62 @@
-# WpfApp
+# GV_SP_Utility (WpfApp)
 
-Applicazione WPF in C# con una finestra principale e menu File (Apri File, Chiudi applicazione), gestione di file Touchstone, tabelle e grafico delle magnitudini.
+Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (parametri S), con funzionalità di plotting avanzate e tabelle dati.
 
-## Avvio
+## Funzionalità Principali
 
-Compila ed esegui il progetto con Visual Studio o con `dotnet run --project ./WpfApp`.
+### Gestione File
+- **Caricamento Multiplo**: Supporto per l'apertura simultanea di più file Touchstone (`.s*p`, `.spd`).
+- **Parsing**: Supporto per i formati dati:
+  - **RI**: Reale-Immaginario
+  - **MA**: Magnitudine-Angolo (Gradi)
+  - _Nota: Altri formati (es. DB) non sono attualmente supportati._
+- **Rilevamento Porte**: Deduzione automatica del numero di porte basata sulla struttura dei dati nel file.
 
-## Funzionalità
-- Apertura multipla di file Touchstone (.s*p, .spd) con parsing dei formati RI e MA.
-- Visualizzazione tabelle dati e magnitudini (in dB) per ciascun file dal menu Tabelle (generate solo su richiesta).
-- Calcolo automatico delle magnitudini (da RI o MA) per ogni parametro S.
-- Finestra Grafici per selezionare parametri anche da file diversi e tracciare magnitudini vs frequenza su sfondo bianco con assi etichettati.
-- Menu File con voci Apri File e Chiudi applicazione.
+### Visualizzazione Dati
+- **Tabelle Dati**: Visualizzazione tabellare dettagliata per ogni file caricato, accessibile dal menu `Tabelle`.
+- **Dati Calcolati**: Conversione automatica e visualizzazione di Magnitudine (lineare e dB), Fase (gradi), Parte Reale e Immaginaria.
 
-## Requisiti
-- .NET 8.0 o superiore
+### Grafici (Plotting)
+- **Finestra Grafici Dedicata**: Interfaccia flessibile per il confronto di parametri S.
+- **Selezione Multipla**: Possibilità di selezionare e sovrapporre curve (es. S11, S21) provenienti da file diversi.
+- **Assi Personalizzabili**:
+  - Scala Lineare o Logaritmica per entrambi gli assi (X: Frequenza, Y: Magnitudine dB).
+  - Autoscaling (default) o limiti manuali (Min/Max).
+- **Interattività**: Zoom e Pan (grazie alla libreria OxyPlot).
+- **Pulizia Automatica**: Il grafico si svuota automaticamente se nessun parametro è selezionato o se il file di origine viene rimosso.
 
-## Struttura
-- App.xaml / App.xaml.cs
-- MainWindow.xaml / MainWindow.xaml.cs
-- TouchstoneParser.cs (parser e modelli dati)
-- GraphWindow.xaml / GraphWindow.xaml.cs (visualizzazione grafico)
+## Requisiti di Sistema
 
-## Note
-Il parser deduce il numero di porte dal conteggio dei parametri per ciascun blocco di frequenza. I dati sono normalizzati in Hz e memorizzati come numeri complessi, con magnitudini calcolate automaticamente.
+- **Framework**: .NET 8.0 (Windows)
+- **Sistema Operativo**: Windows 10/11
+
+## Istruzioni per l'Uso
+
+1. **Avvio**:
+   - Aprire la soluzione in Visual Studio o VS Code.
+   - Eseguire il progetto `WpfApp`.
+   - Alternativamente, da riga di comando: `dotnet run --project ./WpfApp`
+
+2. **Caricamento Dati**:
+   - Menu `File` -> `Apri File...` per selezionare i file `.s2p`, `.s1p`, ecc.
+
+3. **Grafici**:
+   - Menu `Grafici` -> `Apri finestra grafici`.
+   - Nella finestra grafici, espandere i file nella colonna di sinistra e spuntare i parametri desiderati (es. `S11`, `S21`).
+   - Usare il pulsante `Impostazioni` per cambiare scala (Log/Lin) o limiti degli assi.
+
+## Struttura del Progetto
+
+- **MainWindow.xaml**: Finestra principale, gestione menu e lista file caricati.
+- **GraphWindow.xaml**: Logica di visualizzazione dei grafici (basata su OxyPlot).
+- **TableWindow.xaml**: Visualizzazione tabellare dei dati grezzi e calcolati.
+- **SettingsWindow.xaml**: Dialogo per la configurazione degli assi del grafico.
+- **TouchstoneParser.cs**: Motore di parsing e modelli dati per i file Touchstone.
+
+## Dipendenze
+
+- **OxyPlot.Wpf**: Libreria per la generazione dei grafici.
+
+## Note Tecniche
+
+Il parser normalizza tutte le frequenze in Hz. I dati vengono memorizzati internamente come numeri complessi, permettendo conversioni on-the-fly tra le varie rappresentazioni (Mag/Phase/dB).
