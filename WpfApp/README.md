@@ -1,6 +1,6 @@
 # GV_SP_Utility (WpfApp)
 
-Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (parametri S), con funzionalità di plotting avanzate e tabelle dati.
+Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (parametri S), con funzionalità di plotting avanzate (dominio della frequenza e del tempo - TDR) e tabelle dati.
 
 ## Funzionalità Principali
 
@@ -17,13 +17,19 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
 - **Dati Calcolati**: Conversione automatica e visualizzazione di Magnitudine (lineare e dB), Fase (gradi), Parte Reale e Immaginaria.
 
 ### Grafici (Plotting)
-- **Finestra Grafici Dedicata**: Interfaccia flessibile per il confronto di parametri S.
-- **Selezione Multipla**: Possibilità di selezionare e sovrapporre curve (es. S11, S21) provenienti da file diversi.
-- **Assi Personalizzabili**:
-  - Scala Lineare o Logaritmica per entrambi gli assi (X: Frequenza, Y: Magnitudine dB).
-  - Autoscaling (default) o limiti manuali (Min/Max).
-- **Interattività**: Zoom e Pan (grazie alla libreria OxyPlot).
-- **Pulizia Automatica**: Il grafico si svuota automaticamente se nessun parametro è selezionato o se il file di origine viene rimosso.
+- **Menu Grafici**: Accesso a grafici nel dominio della frequenza e nel dominio del tempo (TDR).
+  - **Dominio della Frequenza**: Confronto di parametri S (Magnitudine dB vs Frequenza).
+    - Selezione Multipla e sovrapposizione curve.
+    - Scala Lineare o Logaritmica, Autoscaling.
+    - Zoom e Pan interattivi per entrambi gli assi.
+  - **Dominio del Tempo (TDR)**: Analisi di riflettometria nel tempo (Impedenza vs Tempo).
+    - **Calcolo TDR**: Conversione da Parametri S a profilo di impedenza tramite IFFT.
+    - **Controlli**:
+      - **Rise Time**: Filtro gaussiano per simulare il tempo di salita del segnale.
+      - **Windowing**: Finestre (Rectangular, Hamming, Hanning, Blackman) per ridurre il ringing.
+      - **Delay**: Offset temporale.
+      - **Impedenza di sistema ($Z_0$)**: Impostabile (es. 50 $\Omega$).
+    - Visualizzazione interattiva del profilo di impedenza nel tempo.
 
 ## Requisiti di Sistema
 
@@ -41,13 +47,17 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
    - Menu `File` -> `Apri File...` per selezionare i file `.s2p`, `.s1p`, ecc.
 
 3. **Grafici**:
-   - Menu `Grafici` -> `Apri finestra grafici`.
-   - Nella finestra grafici, espandere i file nella colonna di sinistra e spuntare i parametri desiderati (es. `S11`, `S21`).
-   - Usare il pulsante `Impostazioni` per cambiare scala (Log/Lin) o limiti degli assi.
+   - **Frequenza**: Menu `Grafici` -> `Apri Freuency Domain`.
+   - **TDR**: Menu `Grafici` -> `Apri Time Domain (TDR)`.
+     - Selezionare il parametro desiderato (es. $S_{11}$, $S_{22}$) dal pannello laterale.
+     - Impostare Rise Time e altri parametri (es. Windowing).
+     - Premere `Aggiorna Grafico`.
 
 ## Struttura del Progetto
 
-- **MainWindow.xaml**: Finestra principale, gestione menu e lista file caricati.
+- **MainWindow.xaml**: Finestra principale, gestione menu.
+- **TdrWindow.xaml**: Finestra per l'analisi TDR.
+- **TdrCalculator.cs**: Logica di calcolo TDR (IFFT, Windowing, Step Response).
 - **GraphWindow.xaml**: Logica di visualizzazione dei grafici (basata su OxyPlot).
 - **TableWindow.xaml**: Visualizzazione tabellare dei dati grezzi e calcolati.
 - **SettingsWindow.xaml**: Dialogo per la configurazione degli assi del grafico.

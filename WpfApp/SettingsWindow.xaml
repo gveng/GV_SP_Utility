@@ -1,7 +1,7 @@
 <Window x:Class="WpfApp.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Impostazioni grafico" Height="380" Width="420" ResizeMode="NoResize">
+        Title="Chart Settings" Height="380" Width="420" ResizeMode="NoResize">
     <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -11,25 +11,25 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <GroupBox Header="Scala X" Margin="0 0 0 8">
+        <GroupBox Header="X Scale" Margin="0 0 0 8">
             <StackPanel Orientation="Horizontal" Margin="8">
-                <RadioButton x:Name="XLinear" Content="Lineare" IsChecked="True" />
-                <RadioButton x:Name="XLog" Content="Logaritmica" />
+                <RadioButton x:Name="XLinear" Content="Linear" IsChecked="True" />
+                <RadioButton x:Name="XLog" Content="Logarithmic" />
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="Scala Y" Grid.Row="1" Margin="0 0 0 8">
+        <GroupBox Header="Y Scale" Grid.Row="1" Margin="0 0 0 8">
             <StackPanel Orientation="Horizontal" Margin="8">
-                <RadioButton x:Name="YLinear" Content="Lineare" IsChecked="True" />
-                <RadioButton x:Name="YLog" Content="Logaritmica" />
+                <RadioButton x:Name="YLinear" Content="Linear" IsChecked="True" />
+                <RadioButton x:Name="YLog" Content="Logarithmic" />
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="Range X" Grid.Row="2" Margin="0 0 0 8">
+        <GroupBox Header="X Range" Grid.Row="2" Margin="0 0 0 8">
             <StackPanel Margin="8">
                 <StackPanel Orientation="Horizontal" Margin="0 0 0 6">
                     <RadioButton x:Name="XAuto" Content="Auto" IsChecked="True" Checked="XAuto_Checked" />
-                    <RadioButton x:Name="XManual" Content="Manuale" Checked="XManual_Checked" />
+                    <RadioButton x:Name="XManual" Content="Manual" Checked="XManual_Checked" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Min" VerticalAlignment="Center" />
@@ -40,11 +40,11 @@
             </StackPanel>
         </GroupBox>
 
-        <GroupBox Header="Range Y" Grid.Row="3" Margin="0 0 0 8">
+        <GroupBox Header="Y Range" Grid.Row="3" Margin="0 0 0 8">
             <StackPanel Margin="8">
                 <StackPanel Orientation="Horizontal" Margin="0 0 0 6">
                     <RadioButton x:Name="YAuto" Content="Auto" IsChecked="True" Checked="YAuto_Checked" />
-                    <RadioButton x:Name="YManual" Content="Manuale" Checked="YManual_Checked" />
+                    <RadioButton x:Name="YManual" Content="Manual" Checked="YManual_Checked" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Min" VerticalAlignment="Center" />
@@ -57,7 +57,7 @@
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 8 0 0">
             <Button Content="OK" Width="90" Click="Ok_Click" />
-            <Button Content="Annulla" Width="90" Click="Cancel_Click" />
+            <Button Content="Cancel" Width="90" Click="Cancel_Click" />
         </StackPanel>
     </Grid>
 </Window>

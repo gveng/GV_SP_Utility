@@ -21,17 +21,22 @@ namespace WpfApp
         {
             if (_loadedFiles.Count == 0)
             {
-                MessageBox.Show(this, "Carica prima almeno un file Touchstone.", "Grafico TDR", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, "Please load at least one Touchstone file first.", "TDR Charts", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
+            var window = new TdrWindow(_loadedFiles)
+            {
+                Owner = this
+            };
+            window.Show();
         }
 
         private void MenuItem_OpenFile(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                Filter = "Touchstone (*.s*p;*.spd)|*.s*p;*.spd|Tutti i file (*.*)|*.*",
+                Filter = "Touchstone (*.s*p;*.spd)|*.s*p;*.spd|All files (*.*)|*.*",
                 Multiselect = true
             };
 
@@ -50,7 +55,7 @@ namespace WpfApp
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(this, $"Errore nel parsing di {filePath}: {ex.Message}", "Errore", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(this, $"Error parsing {filePath}: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -64,7 +69,7 @@ namespace WpfApp
         {
             if (_loadedFiles.Count == 0)
             {
-                MessageBox.Show(this, "Carica prima almeno un file Touchstone.", "Grafico", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, "Please load at least one Touchstone file first.", "Charts", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -79,7 +84,7 @@ namespace WpfApp
         private DataGrid BuildRawGrid(TouchstoneFileData file)
         {
             var table = new DataTable();
-            table.Columns.Add("Frequenza (Hz)", typeof(double));
+            table.Columns.Add("Frequency (Hz)", typeof(double));
 
             var isRi = string.Equals(file.Format, "RI", StringComparison.OrdinalIgnoreCase);
 

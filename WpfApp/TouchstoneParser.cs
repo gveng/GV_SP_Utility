@@ -79,20 +79,20 @@ namespace WpfApp
         {
             if (!File.Exists(filePath))
             {
-                throw new FileNotFoundException("File non trovato", filePath);
+                throw new FileNotFoundException("File not found", filePath);
             }
 
             var lines = File.ReadAllLines(filePath);
             var optionLine = lines.FirstOrDefault(l => l.TrimStart().StartsWith("#", StringComparison.Ordinal));
             if (optionLine == null)
             {
-                throw new InvalidDataException("Linea di opzioni (# ...) mancante.");
+                throw new InvalidDataException("Option line (# ...) missing.");
             }
 
             var optionTokens = optionLine.TrimStart('#', ' ', '\t').Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
             if (optionTokens.Length < 3)
             {
-                throw new InvalidDataException("Linea di opzioni (# ...) non valida.");
+                throw new InvalidDataException("Invalid option line (# ...).");
             }
 
             var frequencyUnit = optionTokens[0].ToUpperInvariant();
@@ -101,18 +101,18 @@ namespace WpfApp
 
             if (parameterType != "S")
             {
-                throw new NotSupportedException($"Parametro {parameterType} non supportato (solo S).");
+                throw new NotSupportedException($"Parameter type {parameterType} not supported (only S).");
             }
 
             if (!FrequencyMultipliers.TryGetValue(frequencyUnit, out var freqMultiplier))
             {
-                throw new NotSupportedException($"Unità di frequenza {frequencyUnit} non supportata.");
+                throw new NotSupportedException($"Frequency unit {frequencyUnit} not supported.");
             }
 
             var dataBlocks = CollectDataBlocks(lines, optionLine);
             if (dataBlocks.Count == 0)
             {
-                throw new InvalidDataException("Nessun dato trovato nel file touchstone.");
+                throw new InvalidDataException("No data found in touchstone file.");
             }
 
             int? detectedPorts = null;
@@ -131,7 +131,7 @@ namespace WpfApp
 
                 if (valueTokens.Count % 2 != 0)
                 {
-                    throw new InvalidDataException("Numero di valori non coerente (attesi coppie di numeri per i parametri).");
+                    throw new InvalidDataException("Inconsistent number of values (expected value pairs for parameters).");
                 }
 
                 if (detectedPorts == null)
@@ -141,7 +141,7 @@ namespace WpfApp
                     var portCount = (int)Math.Round(portGuess);
                     if (portCount * portCount != parameterCount)
                     {
-                        throw new InvalidDataException("Impossibile determinare il numero di porte dal conteggio dei dati.");
+                        throw new InvalidDataException("Unable to determine port count from data entries.");
                     }
 
                     detectedPorts = portCount;
@@ -152,7 +152,7 @@ namespace WpfApp
                 var expectedParameterCount = ports * ports;
                 if (valueTokens.Count != expectedParameterCount * 2)
                 {
-                    throw new InvalidDataException("Il numero di valori non corrisponde al numero di parametri atteso.");
+                    throw new InvalidDataException("Number of values does not match expected parameter count.");
                 }
 
                 var parameters = new List<TouchstoneParameterValue>(expectedParameterCount);
@@ -185,7 +185,7 @@ namespace WpfApp
                     }
                     else
                     {
-                        throw new NotSupportedException($"Formato dati {dataFormat} non supportato (solo RI o MA).");
+                        throw new NotSupportedException($"Data format {dataFormat} not supported (only RI or MA).");
                     }
 
                     var name = parameterNames[i];

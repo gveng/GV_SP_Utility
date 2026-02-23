@@ -5,21 +5,22 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
-                <MenuItem Header="Apri File" Click="MenuItem_OpenFile" />
+                <MenuItem Header="Open File..." Click="MenuItem_OpenFile" />
                 <Separator />
-                <MenuItem Header="Chiudi applicazione" Click="MenuItem_Exit" />
+                <MenuItem Header="Exit" Click="MenuItem_Exit" />
             </MenuItem>
-            <MenuItem Header="Tabelle" x:Name="TablesMenu" />
-            <MenuItem Header="Grafici">
-                <MenuItem Header="Apri finestra grafici" Click="MenuItem_OpenCharts" />
+            <MenuItem Header="Tables" x:Name="TablesMenu" />
+            <MenuItem Header="Charts">
+                <MenuItem Header="Open Frequency Domain Charts" Click="MenuItem_OpenCharts" />
+                <MenuItem Header="Open Time Domain (TDR)" Click="MenuItem_OpenTdrCharts" />
             </MenuItem>
         </Menu>
         <Grid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="12">
                 <StackPanel>
-                    <TextBlock Text="Carica file Touchstone dal menu File → Apri File." FontSize="16" Margin="0 0 0 8" />
-                    <TextBlock Text="Apri tabelle dal menu Tabelle: ogni tabella si apre in una finestra separata e chiudibile." TextWrapping="Wrap" />
-                    <TextBlock Text="Apri la finestra Grafici dal menu Grafici." TextWrapping="Wrap" Margin="0 6 0 0" />
+                    <TextBlock Text="Load Touchstone file from File menu → Open File..." FontSize="16" Margin="0 0 0 8" />
+                    <TextBlock Text="Open tables from Tables menu: each table opens in a separate window." TextWrapping="Wrap" />
+                    <TextBlock Text="Open Charts window from Charts menu." TextWrapping="Wrap" Margin="0 6 0 0" />
                 </StackPanel>
             </ScrollViewer>
         </Grid>

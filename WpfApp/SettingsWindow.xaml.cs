@@ -47,7 +47,7 @@ namespace WpfApp
             {
                 if (!TryParseBox(XMinBox, out var xmin) || !TryParseBox(XMaxBox, out var xmax))
                 {
-                    MessageBox.Show(this, "Inserisci valori numerici validi per Min/Max X.", "Impostazioni", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(this, "Please enter valid numeric values for X Min/Max.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -63,7 +63,7 @@ namespace WpfApp
             {
                 if (!TryParseBox(YMinBox, out var ymin) || !TryParseBox(YMaxBox, out var ymax))
                 {
-                    MessageBox.Show(this, "Inserisci valori numerici validi per Min/Max Y.", "Impostazioni", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(this, "Please enter valid numeric values for Y Min/Max.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
@@ -77,7 +77,7 @@ namespace WpfApp
 
             if (!Settings.Validate(out var error))
             {
-                MessageBox.Show(this, error, "Impostazioni", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, error, "Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
