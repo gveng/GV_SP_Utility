@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     
     <!-- Project Details -->
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Gabriele Vittori</Authors>
     <Company>FormFactor</Company>
     <Product>S-Parameter and TDR Plot</Product>
