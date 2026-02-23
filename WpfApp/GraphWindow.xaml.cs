@@ -64,6 +64,25 @@ namespace WpfApp
             }
         }
 
+        private void Scale_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded) return;
+
+            _settings.IsXLog = XLogRadio.IsChecked == true;
+            _settings.IsYLog = YLogRadio.IsChecked == true;
+            
+            // Force Auto range when switching scales to avoid invalid manual ranges (e.g. log <= 0)
+            // since the manual range UI is removed.
+            _settings.IsXAuto = true;
+            _settings.IsYAuto = true;
+
+            var selected = GetCurrentSelection();
+            if (selected.Count > 0)
+            {
+                DrawChart(selected);
+            }
+        }
+
         private void PopulateSelections()
         {
             var previousSelection = _fileSelections
@@ -102,13 +121,16 @@ namespace WpfApp
 
             model.IsLegendVisible = false;
 
+            bool isDb = MagDbRadio.IsChecked == true;
+            string yTitle = isDb ? "Amplitude (dB)" : "Amplitude (Linear)";
+
             Axis xAxis = _settings.IsXLog
                 ? new LogarithmicAxis { Position = AxisPosition.Bottom, Title = "Frequency (Hz)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot }
                 : new LinearAxis { Position = AxisPosition.Bottom, Title = "Frequency (Hz)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot, StringFormat = "0.###E+0" };
 
             Axis yAxis = _settings.IsYLog
-                ? new LogarithmicAxis { Position = AxisPosition.Left, Title = "Amplitude (dB)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot }
-                : new LinearAxis { Position = AxisPosition.Left, Title = "Amplitude (dB)", MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot };
+                ? new LogarithmicAxis { Position = AxisPosition.Left, Title = yTitle, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot }
+                : new LinearAxis { Position = AxisPosition.Left, Title = yTitle, MajorGridlineStyle = LineStyle.Solid, MinorGridlineStyle = LineStyle.Dot };
 
             if (!_settings.IsXAuto)
             {
@@ -145,8 +167,12 @@ namespace WpfApp
 
                 foreach (var point in sel.File.Points)
                 {
-                    var magnitudeDb = ToDb(point.Parameters[paramIndex].Magnitude);
-                    series.Points.Add(new DataPoint(point.FrequencyHz, magnitudeDb));
+                    double val = point.Parameters[paramIndex].Magnitude;
+                    if (isDb)
+                    {
+                        val = ToDb(val);
+                    }
+                    series.Points.Add(new DataPoint(point.FrequencyHz, val));
                 }
 
                 model.Series.Add(series);

@@ -11,6 +11,23 @@
         </Grid.RowDefinitions>
 
         <DockPanel Margin="0 0 0 10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                <TextBlock Text="X Axis: " VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
+                <RadioButton x:Name="XLinearRadio" Content="Linear" GroupName="XScale" IsChecked="True" Checked="Scale_Changed" Margin="0,0,10,0"/>
+                <RadioButton x:Name="XLogRadio" Content="Logarithmic" GroupName="XScale" Checked="Scale_Changed"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                <TextBlock Text="Y Axis: " VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
+                <RadioButton x:Name="YLinearRadio" Content="Linear" GroupName="YScale" IsChecked="True" Checked="Scale_Changed" Margin="0,0,10,0"/>
+                <RadioButton x:Name="YLogRadio" Content="Logarithmic" GroupName="YScale" Checked="Scale_Changed"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Values: " VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
+                <RadioButton x:Name="MagDbRadio" Content="dB" GroupName="MagScale" IsChecked="True" Checked="Scale_Changed" Margin="0,0,10,0"/>
+                <RadioButton x:Name="MagLinearRadio" Content="Linear" GroupName="MagScale" Checked="Scale_Changed"/>
+            </StackPanel>
         </DockPanel>
 
         <ScrollViewer Grid.Row="1" Margin="0,0,0,10" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">

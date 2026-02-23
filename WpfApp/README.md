@@ -18,10 +18,12 @@ Applicazione WPF in C# per l'analisi e la visualizzazione di file Touchstone (pa
 
 ### Grafici (Plotting)
 - **Menu Grafici**: Accesso a grafici nel dominio della frequenza e nel dominio del tempo (TDR).
-  - **Dominio della Frequenza**: Confronto di parametri S (Magnitudine dB vs Frequenza).
+  - **Dominio della Frequenza**: Confronto di parametri S.
+    - **Visualizzazione**: Magnitudine (dB o Lineare) vs Frequenza.
+    - **Controllo Assi**: Scala Lineare o Logaritmica per entrambi gli assi X e Y.
     - Selezione Multipla e sovrapposizione curve.
-    - Scala Lineare o Logaritmica, Autoscaling.
-    - Zoom e Pan interattivi per entrambi gli assi.
+    - Zoom e Pan interattivi.
+    - Legenda mobile.
   - **Dominio del Tempo (TDR)**: Analisi di riflettometria nel tempo (Impedenza vs Tempo).
     - **Calcolo TDR**: Conversione da Parametri S a profilo di impedenza tramite IFFT.
     - **Controlli**:
