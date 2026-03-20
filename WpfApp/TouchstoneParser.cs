@@ -15,6 +15,7 @@ namespace WpfApp
             int portCount,
             string format,
             string frequencyUnit,
+            double referenceImpedance,
             IReadOnlyList<string> parameterNames,
             IReadOnlyList<TouchstoneDataPoint> points)
         {
@@ -22,6 +23,7 @@ namespace WpfApp
             PortCount = portCount;
             Format = format;
             FrequencyUnit = frequencyUnit;
+            ReferenceImpedance = referenceImpedance;
             ParameterNames = new ReadOnlyCollection<string>(parameterNames.ToList());
             Points = new ReadOnlyCollection<TouchstoneDataPoint>(points.ToList());
         }
@@ -31,6 +33,7 @@ namespace WpfApp
         public int PortCount { get; }
         public string Format { get; }
         public string FrequencyUnit { get; }
+        public double ReferenceImpedance { get; }
         public IReadOnlyList<string> ParameterNames { get; }
         public IReadOnlyList<TouchstoneDataPoint> Points { get; }
     }
@@ -98,6 +101,20 @@ namespace WpfApp
             var frequencyUnit = optionTokens[0].ToUpperInvariant();
             var parameterType = optionTokens[1].ToUpperInvariant();
             var dataFormat = optionTokens[2].ToUpperInvariant();
+            double referenceImpedance = 50.0;
+
+            // Search for R and its value
+            for (var i = 3; i < optionTokens.Length; i++)
+            {
+                if (string.Equals(optionTokens[i], "R", StringComparison.OrdinalIgnoreCase) && i + 1 < optionTokens.Length)
+                {
+                    if (double.TryParse(optionTokens[i + 1], NumberStyles.Float, CultureInfo.InvariantCulture, out var r))
+                    {
+                        referenceImpedance = r;
+                        break;
+                    }
+                }
+            }
 
             if (parameterType != "S")
             {
@@ -213,7 +230,7 @@ namespace WpfApp
                 points.Add(new TouchstoneDataPoint(frequency, parameters));
             }
 
-            return new TouchstoneFileData(filePath, detectedPorts ?? 0, dataFormat, frequencyUnit, parameterNames, points);
+            return new TouchstoneFileData(filePath, detectedPorts ?? 0, dataFormat, frequencyUnit, referenceImpedance, parameterNames, points);
         }
 
         private static List<List<string>> CollectDataBlocks(string[] lines, string optionLine, int? expectedPorts)

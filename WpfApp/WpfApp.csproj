@@ -4,12 +4,13 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <AssemblyName>SParameterAnalyzer</AssemblyName>
     
     <!-- Project Details -->
     <Version>1.1.0</Version>
     <Authors>Gabriele Vittori</Authors>
     <Company>FormFactor</Company>
-    <Product>S-Parameter and TDR Plot</Product>
+    <Product>S-Parameter Analyzer</Product>
     <Description>Utility for S-Parameter and TDR analysis</Description>
     <Copyright>Copyright © 2026</Copyright>
   </PropertyGroup>

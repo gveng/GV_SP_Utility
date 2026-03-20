@@ -5,12 +5,20 @@
     Title="Charts" Height="700" Width="1100">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" /> <!-- Parametri -->
-            <RowDefinition Height="*" />    <!-- Selezione parametri -->
-            <RowDefinition Height="3*" />   <!-- Grafico: 75% -->
+            <RowDefinition Height="Auto" /> <!-- Settings -->
+            <RowDefinition Height="3*" />   <!-- Selection (30%) -->
+            <RowDefinition Height="7*" />   <!-- Graph (70%) -->
         </Grid.RowDefinitions>
 
         <DockPanel Margin="0 0 0 10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                <TextBlock Text="Format: " VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
+                <RadioButton x:Name="FormatDbRadio" Content="dB" GroupName="ValueFormat" IsChecked="True" Checked="Format_Changed" Margin="0,0,10,0"/>
+                <RadioButton x:Name="FormatLinearRadio" Content="Linear" GroupName="ValueFormat" Checked="Format_Changed" Margin="0,0,10,0"/>
+                <RadioButton x:Name="FormatImpedanceRadio" Content="Impedance" GroupName="ValueFormat" Checked="Format_Changed"/>
+                <Button Content="Fit RLC" Click="CalculateRlc_Click" Margin="15,0,0,0" Padding="8,2" VerticalAlignment="Center" />
+            </StackPanel>
+
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
                 <TextBlock Text="X Axis: " VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
                 <RadioButton x:Name="XLinearRadio" Content="Linear" GroupName="XScale" IsChecked="True" Checked="Scale_Changed" Margin="0,0,10,0"/>
@@ -24,11 +32,11 @@
             </StackPanel>
         </DockPanel>
 
-        <ScrollViewer Grid.Row="1" Margin="0,0,0,10" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" Margin="0,0,0,10" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <ItemsControl x:Name="SelectionColumns">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Rows="1" />
+                        <StackPanel Orientation="Vertical" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
@@ -39,25 +47,28 @@
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Border Grid.Column="0" Background="#f5f5f5" Margin="0 0 8 0" Padding="4">
-                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold" TextAlignment="Center">
-                                        <TextBlock.LayoutTransform>
-                                            <RotateTransform Angle="-90" />
-                                        </TextBlock.LayoutTransform>
-                                    </TextBlock>
+                                
+                                <!-- File Name (Horizontal, normal) -->
+                                <Border Grid.Column="0" Background="#f5f5f5" Margin="0 0 8 0" Padding="6" MinWidth="150">
+                                    <TextBlock Text="{Binding FileName}" FontWeight="Bold" TextAlignment="Left" VerticalAlignment="Center" TextWrapping="Wrap" />
                                 </Border>
-                                <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxHeight="280">
-                                    <ItemsControl ItemsSource="{Binding Parameters}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <CheckBox Content="{Binding Name}"
-                                                          IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                          Checked="ParameterCheckBox_Toggled"
-                                                          Unchecked="ParameterCheckBox_Toggled" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
+
+                                <!-- Parameters (Horizontal Wrap) -->
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Parameters}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Content="{Binding Name}" Margin="0,0,15,5"
+                                                      IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                      Checked="ParameterCheckBox_Toggled"
+                                                      Unchecked="ParameterCheckBox_Toggled" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </Grid>
                         </Border>
                     </DataTemplate>

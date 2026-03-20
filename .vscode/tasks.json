@@ -4,8 +4,9 @@
 		{
 			"label": "Esegui WpfApp",
 			"type": "shell",
-			"command": "dotnet run",
+			"command": "dotnet",
 			"args": [
+				"run",
 				"--project",
 				"./WpfApp"
 			],
@@ -16,8 +17,9 @@
 		{
 			"label": "Pubblica Release (SingleFile)",
 			"type": "shell",
-			"command": "dotnet publish",
+			"command": "dotnet",
 			"args": [
+				"publish",
 				"WpfApp",
 				"-c",
 				"Release",
@@ -26,11 +28,26 @@
 				"--self-contained",
 				"true",
 				"-p:PublishSingleFile=true",
+				"-p:IncludeNativeLibrariesForSelfExtract=true",
 				"-o",
 				"Publish/SingleFile"
 			],
 			"group": "build",
 			"problemMatcher": []
+		},
+		{
+			"label": "Build",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"./WpfApp"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
 		}
 	]
 }
