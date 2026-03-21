@@ -62,9 +62,9 @@ namespace WpfApp
     {
         public double PlaneResistivity { get; set; } = 1.72e-8;   // Copper Ω·m
         public double PlaneThickness { get; set; } = 35e-6;       // 35 µm (1 oz Cu)
-        public double ProbeSeriesR { get; set; }
-        public double ProbeSeriesL { get; set; }
-        public double ProbeParallelC { get; set; }
+        public double ProbeSeriesR { get; set; } = 0.1;          // 0.1 Ω
+        public double ProbeSeriesL { get; set; } = 1.3e-9;       // 1.3 nH
+        public double ProbeParallelC { get; set; } = 1e-13;      // 0.1 pF
     }
 
     public class ProbeConfig
@@ -1029,6 +1029,119 @@ namespace WpfApp
             }
         }
 
+        // ─────────────────────── PDN IMPEDANCE ─────────────────────
+        private void PdnImpedance_Click(object sender, RoutedEventArgs e)
+        {
+            if (_probePoints.Count == 0)
+            {
+                MessageBox.Show("No probes defined. Place probes first.", "PDN Impedance",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (_capacitorAssignments.Count == 0)
+            {
+                MessageBox.Show("No capacitors assigned. Place capacitors first.", "PDN Impedance",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var win = new PdnImpedanceWindow(_probePoints, _probeDomains, _capacitorAssignments, _boardParams);
+            win.Owner = this;
+            win.Show();
+        }
+
+        // ─────────────────────── DOMAIN MANAGER ────────────────────
+        private void ManageDomains_Click(object sender, RoutedEventArgs e)
+        {
+            // Collect all distinct domains from probes and capacitors
+            var domainSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var d in _probeDomains)
+                if (!string.IsNullOrWhiteSpace(d)) domainSet.Add(d);
+            foreach (var c in _capacitorAssignments)
+                if (!string.IsNullOrWhiteSpace(c.DomainName)) domainSet.Add(c.DomainName);
+
+            if (domainSet.Count == 0)
+            {
+                MessageBox.Show("No power domains defined.\nPlace probes and assign them to domains first.",
+                    "Domains", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Build info list: domain name, probe count, cap count, color
+            var domainInfos = new List<(string Domain, int ProbeCount, int CapCount, System.Windows.Media.Brush Color)>();
+            foreach (var domain in domainSet.OrderBy(d => d, StringComparer.OrdinalIgnoreCase))
+            {
+                int probeCount = 0;
+                for (int i = 0; i < _probeDomains.Count; i++)
+                    if (string.Equals(_probeDomains[i], domain, StringComparison.OrdinalIgnoreCase))
+                        probeCount++;
+
+                int capCount = _capacitorAssignments
+                    .Count(c => string.Equals(c.DomainName, domain, StringComparison.OrdinalIgnoreCase));
+
+                var brush = GetDomainBrush(domain);
+                domainInfos.Add((domain, probeCount, capCount, brush));
+            }
+
+            var dlg = new DomainManagerDialog(domainInfos);
+            dlg.Owner = this;
+            if (dlg.ShowDialog() != true || dlg.DomainsToDelete.Count == 0)
+                return;
+
+            DeleteDomains(dlg.DomainsToDelete);
+        }
+
+        private void DeleteDomains(List<string> domainsToDelete)
+        {
+            var toDelete = new HashSet<string>(domainsToDelete, StringComparer.OrdinalIgnoreCase);
+
+            // Exit any active mode
+            if (_isCapacitorMode) ExitCapacitorMode();
+            _isProbeMode = false;
+            _currentProbeDomain = "";
+            _currentCapDomain = "";
+            SyncModeButtons();
+
+            // Close info popups
+            if (_probeInfoWindow != null && _probeInfoWindow.IsLoaded)
+            { _probeInfoWindow.Close(); _probeInfoWindow = null; }
+            if (_capInfoWindow != null && _capInfoWindow.IsLoaded)
+            { _capInfoWindow.Close(); _capInfoWindow = null; }
+
+            // Remove probes belonging to deleted domains (iterate backward)
+            for (int i = _probePoints.Count - 1; i >= 0; i--)
+            {
+                string dom = i < _probeDomains.Count ? _probeDomains[i] : "";
+                if (toDelete.Contains(dom))
+                {
+                    _probePoints.RemoveAt(i);
+                    if (i < _probeDomains.Count) _probeDomains.RemoveAt(i);
+                }
+            }
+
+            // Remove capacitors belonging to deleted domains
+            _capacitorAssignments.RemoveAll(c => toDelete.Contains(c.DomainName ?? ""));
+
+            // Remove deleted domains from color map
+            foreach (var d in toDelete)
+                _domainColorMap.Remove(d);
+
+            // Rebuild visual markers
+            RemoveMarkersByTag("__PROBE__");
+            for (int i = 0; i < _probePoints.Count; i++)
+            {
+                string dom = i < _probeDomains.Count ? _probeDomains[i] : "";
+                AddProbeMarker(_probePoints[i].X, _probePoints[i].Y, dom);
+            }
+
+            RemoveMarkersByTag("__CAP__");
+            foreach (var c in _capacitorAssignments)
+                AddCapacitorMarker(c.Location.X, c.Location.Y, c.FileName, c.FilePath);
+
+            int deletedCount = toDelete.Count;
+            StatusText.Text = $"Deleted {deletedCount} domain(s). Remaining: {_probePoints.Count} probes, {_capacitorAssignments.Count} capacitors.";
+        }
+
         // ─────────────────────── SAVE CONFIG ───────────────────────
         private void SaveConfig_Click(object sender, RoutedEventArgs e)
         {
@@ -1130,20 +1243,43 @@ namespace WpfApp
                 var config = JsonSerializer.Deserialize<DxfSessionConfig>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
                 if (config == null) return;
 
-                // Board params
+                // ── 1. Exit any active mode and close popup windows ──
+                if (_isCapacitorMode) ExitCapacitorMode();
+                _isProbeMode = false;
+                _isCapacitorMode = false;
+                _currentProbeDomain = "";
+                _currentCapDomain = "";
+                if (_probeInfoWindow != null && _probeInfoWindow.IsLoaded)
+                { _probeInfoWindow.Close(); _probeInfoWindow = null; }
+                if (_capInfoWindow != null && _capInfoWindow.IsLoaded)
+                { _capInfoWindow.Close(); _capInfoWindow = null; }
+                SyncModeButtons();
+
+                // ── 2. Board params ──
                 if (config.BoardParams != null) _boardParams = config.BoardParams;
 
-                // Load layout
+                // ── 3. Clear existing state before loading new data ──
+                _probePoints.Clear();
+                _probeDomains.Clear();
+                _domainColorMap.Clear();
+                _capacitorAssignments.Clear();
+                _capFileColorMap.Clear();
+
+                // ── 4. Load layout (this also clears & rebuilds the canvas) ──
                 if (!string.IsNullOrEmpty(config.LayoutFilePath) && File.Exists(config.LayoutFilePath))
                 {
                     LoadLayout(config.LayoutFilePath, config.LayerStates);
                 }
-                else if (!string.IsNullOrEmpty(config.LayoutFilePath))
+                else
                 {
-                    MessageBox.Show($"Layout file not found:\n{config.LayoutFilePath}", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    // No layout or file missing: clear canvas manually
+                    DxfCanvas.Children.Clear();
+                    _layers.Clear();
+                    if (!string.IsNullOrEmpty(config.LayoutFilePath))
+                        MessageBox.Show($"Layout file not found:\n{config.LayoutFilePath}", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
-                // Restore view
+                // ── 5. Restore view ──
                 if (config.ZoomLevel > 0)
                 {
                     _zoomFactor = config.ZoomLevel;
@@ -1160,52 +1296,66 @@ namespace WpfApp
                     UpdateZoomText();
                 }
 
-                // Restore probes
-                _probePoints.Clear();
-                _probeDomains.Clear();
-                _domainColorMap.Clear();
-                RemoveMarkersByTag("__PROBE__");
-                foreach (var p in config.Probes)
+                // ── 6. Restore probes ──
+                if (config.Probes != null)
                 {
-                    _probePoints.Add(new Point(p.X, p.Y));
-                    _probeDomains.Add(p.Domain);
-                    AddProbeMarker(p.X, p.Y, p.Domain);
-                }
-                UpdateProbeInfo();
-
-                // Restore capacitors
-                _capacitorAssignments.Clear();
-                _capFileColorMap.Clear();
-                RemoveMarkersByTag("__CAP__");
-                foreach (var cc in config.Capacitors)
-                {
-                    var assignment = new CapacitorAssignment
+                    foreach (var p in config.Probes)
                     {
-                        FileName = cc.Name,
-                        FilePath = cc.FilePath,
-                        Location = new Point(cc.X, cc.Y),
-                        Coordinates = $"({cc.X:F2}, {cc.Y:F2})",
-                        DomainName = cc.DomainName,
-                        Rlc = new RlcResult { R = cc.FitR, L = cc.FitL, C = cc.FitC, ResonanceFreq = cc.ResonanceFreq },
-                        RlcInfo = $"R={RlcHelper.ToEngineeringNotation(cc.FitR, "Ω")}  " +
-                                  $"L={RlcHelper.ToEngineeringNotation(cc.FitL, "H")}  " +
-                                  $"C={RlcHelper.ToEngineeringNotation(cc.FitC, "F")}  " +
-                                  $"fRes={RlcHelper.ToEngineeringNotation(cc.ResonanceFreq, "Hz")}"
-                    };
-                    _capacitorAssignments.Add(assignment);
-                    AddCapacitorMarker(cc.X, cc.Y, cc.Name, cc.FilePath);
-
-                    // Load the S-param file in the graph
-                    if (!string.IsNullOrEmpty(cc.FilePath) && File.Exists(cc.FilePath))
-                        CapacitorFileLoaded?.Invoke(this, cc.FilePath);
+                        if (p == null) continue;
+                        _probePoints.Add(new Point(p.X, p.Y));
+                        _probeDomains.Add(p.Domain ?? "");
+                        AddProbeMarker(p.X, p.Y, p.Domain ?? "");
+                    }
                 }
-                UpdateCapacitorInfo();
+
+                // ── 7. Restore capacitors ──
+                var filesToNotify = new List<string>();
+                if (config.Capacitors != null)
+                {
+                    foreach (var cc in config.Capacitors)
+                    {
+                        if (cc == null) continue;
+                        try
+                        {
+                            var assignment = new CapacitorAssignment
+                            {
+                                FileName = cc.Name ?? "",
+                                FilePath = cc.FilePath ?? "",
+                                Location = new Point(cc.X, cc.Y),
+                                Coordinates = $"({cc.X:F2}, {cc.Y:F2})",
+                                DomainName = cc.DomainName ?? "",
+                                Rlc = new RlcResult { R = cc.FitR, L = cc.FitL, C = cc.FitC, ResonanceFreq = cc.ResonanceFreq },
+                                RlcInfo = $"R={RlcHelper.ToEngineeringNotation(cc.FitR, "\u03A9")}  " +
+                                          $"L={RlcHelper.ToEngineeringNotation(cc.FitL, "H")}  " +
+                                          $"C={RlcHelper.ToEngineeringNotation(cc.FitC, "F")}  " +
+                                          $"fRes={RlcHelper.ToEngineeringNotation(cc.ResonanceFreq, "Hz")}"
+                            };
+                            _capacitorAssignments.Add(assignment);
+                            AddCapacitorMarker(cc.X, cc.Y, cc.Name ?? "", cc.FilePath ?? "");
+
+                            // Collect files to notify after all caps are restored
+                            if (!string.IsNullOrEmpty(cc.FilePath) && File.Exists(cc.FilePath))
+                                filesToNotify.Add(cc.FilePath);
+                        }
+                        catch (Exception capEx)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Skipping capacitor '{cc.Name}': {capEx.Message}");
+                        }
+                    }
+                }
+
+                // ── 8. Notify parent about loaded cap files (after all state is consistent) ──
+                foreach (var fp in filesToNotify)
+                {
+                    try { CapacitorFileLoaded?.Invoke(this, fp); }
+                    catch { /* parent handler failure should not break config load */ }
+                }
 
                 StatusText.Text = $"Configuration loaded: {_probePoints.Count} probes, {_capacitorAssignments.Count} capacitors";
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading config: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error loading config:\n{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

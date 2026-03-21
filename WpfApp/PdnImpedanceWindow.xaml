@@ -1,0 +1,47 @@
+<Window x:Class="WpfApp.PdnImpedanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        Title="PDN Impedance Analysis" Height="700" Width="1100"
+        Background="#FF1E1E1E" Foreground="White"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="8">
+        <!-- Top controls -->
+        <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" VerticalAlignment="Center">
+                <TextBlock Text="Domain:" Foreground="White" VerticalAlignment="Center" Margin="0,0,6,0" FontWeight="Bold"/>
+                <ComboBox x:Name="CmbDomain" MinWidth="120" SelectionChanged="Domain_Changed" FontSize="13"/>
+                <Separator Margin="12,0"/>
+                <TextBlock Text="R□:" Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBlock x:Name="TxtRsheet" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <TextBlock Text="r₀:" Foreground="White" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBox x:Name="TxtViaPadRadius" Width="60" Text="0.15" VerticalAlignment="Center"
+                         ToolTip="Via/pad effective radius in mm"/>
+                <TextBlock Text="mm" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="4,0,12,0"/>
+                <Button Content="Recalculate" Click="Recalculate_Click" Padding="8,2" VerticalAlignment="Center"/>
+                <Separator Margin="12,0"/>
+                <TextBlock Text="Freq:" Foreground="White" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                <TextBox x:Name="TxtFreqMin" Width="55" Text="" VerticalAlignment="Center" ToolTip="Min frequency (Hz), e.g. 1e3"/>
+                <TextBlock Text="–" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="2,0,2,0"/>
+                <TextBox x:Name="TxtFreqMax" Width="55" Text="" VerticalAlignment="Center" ToolTip="Max frequency (Hz), e.g. 1e9"/>
+                <TextBlock Text="Hz" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="3,0,8,0"/>
+                <TextBlock Text="|Z|:" Foreground="White" VerticalAlignment="Center" Margin="0,0,3,0"/>
+                <TextBox x:Name="TxtZMin" Width="55" Text="" VerticalAlignment="Center" ToolTip="Min |Z| (Ω), e.g. 1e-3"/>
+                <TextBlock Text="–" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="2,0,2,0"/>
+                <TextBox x:Name="TxtZMax" Width="55" Text="" VerticalAlignment="Center" ToolTip="Max |Z| (Ω), e.g. 1e3"/>
+                <TextBlock Text="Ω" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="3,0,8,0"/>
+                <Separator Margin="12,0"/>
+                <Button Content="📄 Report" Click="ExportReport_Click" Padding="8,2" VerticalAlignment="Center"
+                        ToolTip="Export full analysis report to Word document"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Legend / info -->
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+            <TextBlock x:Name="TxtInfo" Foreground="#AAAAAA" FontSize="11" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- OxyPlot chart -->
+        <oxy:PlotView x:Name="PlotView" Background="#FF1E1E1E"/>
+    </DockPanel>
+</Window>

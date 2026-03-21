@@ -37,7 +37,11 @@
                     <Button x:Name="BtnClear" Content="🗑 Clear" Click="ClearAll_Click" ToolTip="Clear all probes or capacitors (Shift+C)"
                             Padding="6,2" Margin="1,0" Visibility="Collapsed"/>
                     <Separator/>
+                    <Button Content="📋 Domains" Click="ManageDomains_Click" ToolTip="View and manage power domains"
+                            Padding="6,2" Margin="1,0"/>
                     <Button Content="⚙ Settings" Click="Settings_Click" ToolTip="Board parameters"
+                            Padding="6,2" Margin="1,0"/>
+                    <Button Content="📊 PDN Impedance" Click="PdnImpedance_Click" ToolTip="PDN impedance analysis"
                             Padding="6,2" Margin="1,0"/>
                 </ToolBar>
             </ToolBarTray>
