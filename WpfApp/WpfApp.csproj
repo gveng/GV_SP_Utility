@@ -16,7 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ACadSharp" Version="*" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="IxMilia.Dxf" Version="0.8.4" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />
   </ItemGroup>
 

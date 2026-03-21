@@ -15,6 +15,9 @@
                 <MenuItem Header="Open Frequency Domain Charts" Click="MenuItem_OpenCharts" />
                 <MenuItem Header="Open Time Domain (TDR)" Click="MenuItem_OpenTdrCharts" />
             </MenuItem>
+            <MenuItem Header="Layout">
+                <MenuItem Header="Open Layout Viewer" Click="MenuItem_OpenLayoutViewer" />
+            </MenuItem>
         </Menu>
         <Grid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="12">

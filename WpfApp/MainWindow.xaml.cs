@@ -32,6 +32,28 @@ namespace WpfApp
             window.Show();
         }
 
+        private void MenuItem_OpenLayoutViewer(object sender, RoutedEventArgs e)
+        {
+            var dxfWin = new DxfWindow { Owner = this };
+            dxfWin.CapacitorFileLoaded += (s, filePath) =>
+            {
+                try
+                {
+                    // Avoid loading duplicates
+                    if (_loadedFiles.Any(f => string.Equals(f.FilePath, filePath, StringComparison.OrdinalIgnoreCase)))
+                        return;
+                    var data = TouchstoneParser.Parse(filePath);
+                    _loadedFiles.Add(data);
+                    AddFileToTablesMenu(data);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Error loading capacitor file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            };
+            dxfWin.Show();
+        }
+
         private void MenuItem_OpenFile(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog

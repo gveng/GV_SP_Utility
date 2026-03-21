@@ -12,4 +12,7 @@
 Segui sistematicamente ogni punto della lista.
 Aggiorna il file copilot-instructions.md nella directory .github direttamente man mano che completi ogni passaggio.
 
-Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati Excel, grafici avanzati (Impedenza), e pacchetto portatile ZIP creato. Include lo script Inno Setup per la creazione dell'installer. Documentazione aggiornata in README.md.
+Applicazione WPF in C# aggiornata con parsing Touchstone (RI/MA), tabelle dati Excel, grafici avanzati (Impedenza), e pacchetto portatile ZIP creato. Include lo script Inno Setup per la creazione dell'installer. Documentazione aggiornata in README.md. Aggiunto visualizzatore file DXF per layout sonde.
+Aggiunto supporto per apertura file DWG tramite libreria ACadSharp. Menu Layout separato.
+Implementata finestra di analisi impedenza PDN con selezione componenti e grafici di impedenza nel dominio della frequenza.
+Migliorata la gestione dei condensatori: il pulsante Clear ora rimuove sia gli elementi a video che la configurazione salvata in memoria.

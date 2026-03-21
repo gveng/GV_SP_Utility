@@ -1,0 +1,17 @@
+<Window x:Class="WpfApp.CapInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Capacitors" Height="400" Width="420"
+        Background="#FF2D2D30" Foreground="White"
+        WindowStartupLocation="Manual"
+        ShowInTaskbar="False" Topmost="True"
+        ResizeMode="CanResizeWithGrip">
+    <DockPanel Margin="8">
+        <TextBlock DockPanel.Dock="Top" Text="Placed Capacitors" FontWeight="Bold" FontSize="13"
+                   Foreground="White" Margin="0,0,0,6"/>
+        <ListBox x:Name="CapList"
+                 Background="#FF1E1E1E" Foreground="White" BorderBrush="#FF3E3E42"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 SelectionMode="Single" FontFamily="Consolas" FontSize="11"/>
+    </DockPanel>
+</Window>
