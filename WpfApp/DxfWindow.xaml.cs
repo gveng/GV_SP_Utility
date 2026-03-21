@@ -80,6 +80,7 @@ namespace WpfApp
         public double Y { get; set; }
         public string Name { get; set; } = "";
         public string FilePath { get; set; } = "";
+        public string DomainName { get; set; } = "";
         public double FitR { get; set; }
         public double FitL { get; set; }
         public double FitC { get; set; }
@@ -118,6 +119,8 @@ namespace WpfApp
         // Capacitor mode
         private bool _isCapacitorMode;
         private readonly List<CapacitorAssignment> _capacitorAssignments = new();
+        private int _capSessionStartIndex;  // index at start of current cap-picking session
+        private string _currentCapDomain = "";  // power domain being worked on in cap mode
 
         // Color palettes
         private static readonly Brush[] DomainColors = new Brush[]
@@ -138,6 +141,10 @@ namespace WpfApp
 
         // Settings
         private BoardParameters _boardParams = new();
+
+        // Info popup windows
+        private ProbeInfoWindow? _probeInfoWindow;
+        private CapInfoWindow? _capInfoWindow;
 
         public DxfWindow()
         {
@@ -622,6 +629,7 @@ namespace WpfApp
                         Location = new Point(cadX, cadY),
                         Coordinates = $"({cadX:F2}, {cadY:F2})",
                         RlcInfo = rlcInfo,
+                        DomainName = _currentCapDomain,
                         Rlc = rlc
                     };
                     _capacitorAssignments.Add(assignment);
@@ -693,6 +701,44 @@ namespace WpfApp
             var pickVis = (_isProbeMode || _isCapacitorMode) ? Visibility.Visible : Visibility.Collapsed;
             BtnUndo.Visibility = pickVis;
             BtnClear.Visibility = pickVis;
+
+            // Show / hide probe info popup
+            if (_isProbeMode)
+            {
+                if (_probeInfoWindow == null || !_probeInfoWindow.IsLoaded)
+                {
+                    _probeInfoWindow = new ProbeInfoWindow { Owner = this };
+                    _probeInfoWindow.Left = this.Left + this.Width + 4;
+                    _probeInfoWindow.Top = this.Top;
+                    _probeInfoWindow.Closed += (s, a) => _probeInfoWindow = null;
+                    _probeInfoWindow.Show();
+                }
+                UpdateProbeInfo();
+            }
+            else
+            {
+                if (_probeInfoWindow != null && _probeInfoWindow.IsLoaded)
+                { _probeInfoWindow.Close(); _probeInfoWindow = null; }
+            }
+
+            // Show / hide capacitor info popup
+            if (_isCapacitorMode)
+            {
+                if (_capInfoWindow == null || !_capInfoWindow.IsLoaded)
+                {
+                    _capInfoWindow = new CapInfoWindow { Owner = this };
+                    _capInfoWindow.Left = this.Left + this.Width + 4;
+                    _capInfoWindow.Top = this.Top;
+                    _capInfoWindow.Closed += (s, a) => _capInfoWindow = null;
+                    _capInfoWindow.Show();
+                }
+                UpdateCapacitorInfo();
+            }
+            else
+            {
+                if (_capInfoWindow != null && _capInfoWindow.IsLoaded)
+                { _capInfoWindow.Close(); _capInfoWindow = null; }
+            }
         }
 
         private void UndoLast_Click(object sender, RoutedEventArgs e)
@@ -705,15 +751,27 @@ namespace WpfApp
                 RemoveLastMarkerByTag("__PROBE__");
                 UpdateProbeInfo();
             }
-            else if (_isCapacitorMode && _capacitorAssignments.Count > 0)
+            else if (_isCapacitorMode)
             {
-                _capacitorAssignments.RemoveAt(_capacitorAssignments.Count - 1);
-                RemoveLastMarkerByTag("__CAP__");
-                UpdateCapacitorInfo();
+                // Undo the last cap in the current domain
+                int idx = -1;
+                for (int i = _capacitorAssignments.Count - 1; i >= 0; i--)
+                {
+                    if (string.Equals(_capacitorAssignments[i].DomainName, _currentCapDomain, StringComparison.OrdinalIgnoreCase))
+                    { idx = i; break; }
+                }
+                if (idx >= 0)
+                {
+                    _capacitorAssignments.RemoveAt(idx);
+                    // Rebuild all cap markers
+                    RemoveMarkersByTag("__CAP__");
+                    foreach (var c in _capacitorAssignments)
+                        AddCapacitorMarker(c.Location.X, c.Location.Y, c.FileName, c.FilePath);
+                    UpdateCapacitorInfo();
+                }
             }
-            else if (!_isProbeMode && !_isCapacitorMode)
+            else
             {
-                // Not in a mode: undo from whichever was placed last
                 StatusText.Text = "Enter Probe or Capacitor mode first, or use Del key.";
             }
         }
@@ -729,9 +787,16 @@ namespace WpfApp
             }
             else if (_isCapacitorMode)
             {
+                // Only clear caps belonging to the current domain
+                var toKeep = _capacitorAssignments
+                    .Where(c => !string.Equals(c.DomainName, _currentCapDomain, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
                 _capacitorAssignments.Clear();
-                _capFileColorMap.Clear();
+                _capacitorAssignments.AddRange(toKeep);
+                // Rebuild markers
                 RemoveMarkersByTag("__CAP__");
+                foreach (var c in _capacitorAssignments)
+                    AddCapacitorMarker(c.Location.X, c.Location.Y, c.FileName, c.FilePath);
                 UpdateCapacitorInfo();
             }
             else
@@ -756,7 +821,6 @@ namespace WpfApp
         {
             if (_isProbeMode)
             {
-                // Finishing probe mode – ask which power domain these probes belong to
                 _isProbeMode = false;
                 _isCapacitorMode = false;
                 SyncModeButtons();
@@ -764,15 +828,25 @@ namespace WpfApp
                 return;
             }
 
-            // Starting probe mode – ask for the power domain name first
-            var dlg = new PromptDialog("Power Domain", "Enter the power domain name for the probes you are about to place:", _currentProbeDomain);
+            // Collect distinct existing domains
+            var existing = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var d in _probeDomains)
+                if (!string.IsNullOrWhiteSpace(d) && seen.Add(d)) existing.Add(d);
+            // also include domains from capacitors
+            foreach (var c in _capacitorAssignments)
+                if (!string.IsNullOrWhiteSpace(c.DomainName) && seen.Add(c.DomainName)) existing.Add(c.DomainName);
+
+            var dlg = new DomainSelectorDialog(
+                "Select an existing power domain or type a new name for the probes you are about to place:",
+                existing, _currentProbeDomain);
             dlg.Owner = this;
-            if (dlg.ShowDialog() != true || string.IsNullOrWhiteSpace(dlg.ResponseText))
+            if (dlg.ShowDialog() != true || string.IsNullOrWhiteSpace(dlg.SelectedDomain))
             {
                 StatusText.Text = "Probe placement cancelled.";
                 return;
             }
-            _currentProbeDomain = dlg.ResponseText.Trim();
+            _currentProbeDomain = dlg.SelectedDomain;
 
             _isProbeMode = true;
             _isCapacitorMode = false;
@@ -804,45 +878,74 @@ namespace WpfApp
 
         private void UpdateProbeInfo()
         {
-            if (_probePoints.Count == 0)
-            {
-                InfoText.Text = "No probes defined.";
-                return;
-            }
-            var sb = new System.Text.StringBuilder();
-            // Group by domain
-            var groups = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < _probePoints.Count; i++)
-            {
-                string dom = i < _probeDomains.Count ? _probeDomains[i] : "";
-                if (!groups.ContainsKey(dom)) groups[dom] = new List<int>();
-                groups[dom].Add(i);
-            }
-            foreach (var kv in groups)
-            {
-                sb.AppendLine($"Domain: {kv.Key}  ({kv.Value.Count} probes)");
-                foreach (int i in kv.Value)
-                    sb.AppendLine($"  P{i + 1}: ({_probePoints[i].X:F2}, {_probePoints[i].Y:F2})");
-            }
-            InfoText.Text = sb.ToString();
+            _probeInfoWindow?.UpdateProbes(_probePoints, _probeDomains);
         }
 
         // ─────────────────────── CAPACITORS ────────────────────────
+
+        /// <summary>
+        /// Shared logic for exiting capacitor mode.
+        /// Domain is already assigned during placement, so just clean up.
+        /// </summary>
+        private void ExitCapacitorMode()
+        {
+            // Close info popup first
+            if (_capInfoWindow != null && _capInfoWindow.IsLoaded)
+            { _capInfoWindow.Close(); _capInfoWindow = null; }
+
+            _isCapacitorMode = false;
+            _isProbeMode = false;
+            _currentCapDomain = "";
+            StatusText.Text = "Capacitor mode OFF";
+            SyncModeButtons();
+        }
+
         private void DefineCapacitors_Click(object sender, RoutedEventArgs e)
         {
             if (_isCapacitorMode)
             {
-                _isCapacitorMode = false;
-                _isProbeMode = false;
-                StatusText.Text = "Capacitor mode OFF";
-                SyncModeButtons();
+                ExitCapacitorMode();
                 return;
             }
 
+            // Collect probe-defined domains
+            var probeDomainList = new List<string>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var d in _probeDomains)
+                if (!string.IsNullOrWhiteSpace(d) && seen.Add(d)) probeDomainList.Add(d);
+
+            if (probeDomainList.Count == 0)
+            {
+                MessageBox.Show("No probe power domains defined yet.\nPlease place probes with a power domain first.",
+                    "No Domains", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (probeDomainList.Count == 1)
+            {
+                // Only one domain – use it directly
+                _currentCapDomain = probeDomainList[0];
+            }
+            else
+            {
+                // Multiple domains – let user choose which one to work on
+                var dlg = new DomainSelectorDialog(
+                    "Select the power domain for the capacitors you are about to place or rework:",
+                    probeDomainList, "", allowNewDomain: false);
+                dlg.Owner = this;
+                if (dlg.ShowDialog() != true || string.IsNullOrWhiteSpace(dlg.SelectedDomain))
+                {
+                    StatusText.Text = "Capacitor placement cancelled.";
+                    return;
+                }
+                _currentCapDomain = dlg.SelectedDomain;
+            }
+
+            _capSessionStartIndex = _capacitorAssignments.Count;
             _isCapacitorMode = true;
             _isProbeMode = false;
             SyncModeButtons();
-            StatusText.Text = "CAPACITOR MODE: Left-click to place capacitors (will ask for S-parameter file). Right-click to pan.";
+            StatusText.Text = $"CAPACITOR MODE [{_currentCapDomain}]: Left-click to place capacitors. Undo/Clear affect only this domain.";
             UpdateCapacitorInfo();
         }
 
@@ -880,20 +983,7 @@ namespace WpfApp
 
         private void UpdateCapacitorInfo()
         {
-            if (_capacitorAssignments.Count == 0)
-            {
-                InfoText.Text = "No capacitors defined.";
-                return;
-            }
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"Capacitors: {_capacitorAssignments.Count}");
-            foreach (var cap in _capacitorAssignments)
-            {
-                sb.AppendLine($"  {cap.FileName}");
-                sb.AppendLine($"    {cap.Coordinates}");
-                sb.AppendLine($"    {cap.RlcInfo}");
-            }
-            InfoText.Text = sb.ToString();
+            _capInfoWindow?.UpdateCapacitors(_capacitorAssignments);
         }
 
         private RlcResult CalculateRlcForFile(TouchstoneFileData fileData)
@@ -985,7 +1075,7 @@ namespace WpfApp
                 config.Probes.Add(new ProbeConfig { X = _probePoints[i].X, Y = _probePoints[i].Y, Domain = dom });
             }
 
-            // Capacitors (with distances to probes)
+            // Capacitors (with distances to same-domain probes)
             foreach (var cap in _capacitorAssignments)
             {
                 var cc = new CapacitorConfig
@@ -994,17 +1084,23 @@ namespace WpfApp
                     Y = cap.Location.Y,
                     Name = cap.FileName,
                     FilePath = cap.FilePath,
+                    DomainName = cap.DomainName,
                     FitR = cap.Rlc?.R ?? 0,
                     FitL = cap.Rlc?.L ?? 0,
                     FitC = cap.Rlc?.C ?? 0,
                     ResonanceFreq = cap.Rlc?.ResonanceFreq ?? 0
                 };
 
-                // Compute distances from this cap to each probe
-                foreach (var probe in _probePoints)
+                // Compute distances from this cap to probes in the same domain
+                for (int i = 0; i < _probePoints.Count; i++)
                 {
-                    double dist = Math.Sqrt(Math.Pow(cap.Location.X - probe.X, 2) + Math.Pow(cap.Location.Y - probe.Y, 2));
-                    cc.ProbeDistances.Add(dist);
+                    string probeDom = i < _probeDomains.Count ? _probeDomains[i] : "";
+                    if (string.Equals(probeDom, cap.DomainName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        double dist = Math.Sqrt(Math.Pow(cap.Location.X - _probePoints[i].X, 2) +
+                                                Math.Pow(cap.Location.Y - _probePoints[i].Y, 2));
+                        cc.ProbeDistances.Add(dist);
+                    }
                 }
 
                 config.Capacitors.Add(cc);
@@ -1089,6 +1185,7 @@ namespace WpfApp
                         FilePath = cc.FilePath,
                         Location = new Point(cc.X, cc.Y),
                         Coordinates = $"({cc.X:F2}, {cc.Y:F2})",
+                        DomainName = cc.DomainName,
                         Rlc = new RlcResult { R = cc.FitR, L = cc.FitL, C = cc.FitC, ResonanceFreq = cc.ResonanceFreq },
                         RlcInfo = $"R={RlcHelper.ToEngineeringNotation(cc.FitR, "Ω")}  " +
                                   $"L={RlcHelper.ToEngineeringNotation(cc.FitL, "H")}  " +
@@ -1125,9 +1222,15 @@ namespace WpfApp
 
             if (e.Key == Key.Escape)
             {
-                _isProbeMode = false;
-                _isCapacitorMode = false;
-                SyncModeButtons();
+                if (_isCapacitorMode)
+                {
+                    ExitCapacitorMode();
+                }
+                else
+                {
+                    _isProbeMode = false;
+                    SyncModeButtons();
+                }
                 StatusText.Text = "Ready";
             }
             else if (e.Key == Key.Delete)
@@ -1140,11 +1243,23 @@ namespace WpfApp
                     RemoveLastMarkerByTag("__PROBE__");
                     UpdateProbeInfo();
                 }
-                else if (_isCapacitorMode && _capacitorAssignments.Count > 0)
+                else if (_isCapacitorMode)
                 {
-                    _capacitorAssignments.RemoveAt(_capacitorAssignments.Count - 1);
-                    RemoveLastMarkerByTag("__CAP__");
-                    UpdateCapacitorInfo();
+                    // Remove last cap of current domain
+                    int idx = -1;
+                    for (int i = _capacitorAssignments.Count - 1; i >= 0; i--)
+                    {
+                        if (string.Equals(_capacitorAssignments[i].DomainName, _currentCapDomain, StringComparison.OrdinalIgnoreCase))
+                        { idx = i; break; }
+                    }
+                    if (idx >= 0)
+                    {
+                        _capacitorAssignments.RemoveAt(idx);
+                        RemoveMarkersByTag("__CAP__");
+                        foreach (var c in _capacitorAssignments)
+                            AddCapacitorMarker(c.Location.X, c.Location.Y, c.FileName, c.FilePath);
+                        UpdateCapacitorInfo();
+                    }
                 }
             }
             else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Shift)
@@ -1159,8 +1274,15 @@ namespace WpfApp
                 }
                 else if (_isCapacitorMode)
                 {
+                    // Clear only caps of current domain
+                    var toKeep = _capacitorAssignments
+                        .Where(c => !string.Equals(c.DomainName, _currentCapDomain, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
                     _capacitorAssignments.Clear();
+                    _capacitorAssignments.AddRange(toKeep);
                     RemoveMarkersByTag("__CAP__");
+                    foreach (var c in _capacitorAssignments)
+                        AddCapacitorMarker(c.Location.X, c.Location.Y, c.FileName, c.FilePath);
                     UpdateCapacitorInfo();
                 }
             }

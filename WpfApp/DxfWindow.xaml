@@ -91,11 +91,6 @@
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Probes / Caps Info -->
-                <StackPanel DockPanel.Dock="Bottom" Margin="4">
-                    <TextBlock x:Name="InfoText" Text="" Foreground="#FFAAAAAA" TextWrapping="Wrap" FontSize="11"/>
-                </StackPanel>
-
                 <!-- Layers List -->
                 <ListBox x:Name="LayersList" Background="Transparent" Foreground="White" BorderThickness="0"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">

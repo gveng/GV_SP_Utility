@@ -19,12 +19,26 @@ namespace WpfApp
                 return;
             }
 
+            // Group by domain (empty domain → "Unassigned")
+            var groups = new Dictionary<string, List<(int Index, CapacitorAssignment Cap)>>(System.StringComparer.OrdinalIgnoreCase);
             for (int i = 0; i < capacitors.Count; i++)
             {
-                var cap = capacitors[i];
-                CapList.Items.Add($"C{i + 1}: {cap.FileName}");
-                CapList.Items.Add($"     {cap.Coordinates}");
-                CapList.Items.Add($"     {cap.RlcInfo}");
+                string dom = string.IsNullOrWhiteSpace(capacitors[i].DomainName) ? "Unassigned" : capacitors[i].DomainName;
+                if (!groups.ContainsKey(dom))
+                    groups[dom] = new List<(int, CapacitorAssignment)>();
+                groups[dom].Add((i, capacitors[i]));
+            }
+
+            foreach (var kv in groups)
+            {
+                CapList.Items.Add($"─── {kv.Key} ({kv.Value.Count} caps) ───");
+                foreach (var (idx, cap) in kv.Value)
+                {
+                    CapList.Items.Add($"  C{idx + 1}: {cap.FileName}");
+                    CapList.Items.Add($"       {cap.Coordinates}");
+                    if (!string.IsNullOrEmpty(cap.RlcInfo))
+                        CapList.Items.Add($"       {cap.RlcInfo}");
+                }
             }
         }
     }

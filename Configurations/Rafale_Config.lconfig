@@ -1,0 +1,224 @@
+{
+  "LayoutFilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\FA251229-024830_X1_padtypes.dwg",
+  "LayerStates": {
+    "0": false,
+    "0 Temp01": false,
+    "00 PixelArea": false,
+    "00 Trace": false,
+    "02Capture": false,
+    "02Capture PlaneHole": false,
+    "02CaptureKeep": false,
+    "03 Window": false,
+    "03 window keepout": false,
+    "05 LGA Diff": false,
+    "05 LGA GND": false,
+    "Beam_At_Post": false,
+    "CAPACITORS": false,
+    "CPNEG": false,
+    "CPPOS": false,
+    "DC": false,
+    "DRV": false,
+    "GND": false,
+    "IO": false,
+    "NC": false,
+    "POST": false,
+    "VDD1": false,
+    "VDD10": false,
+    "VDD11": false,
+    "VDD12": false,
+    "VDD13": false,
+    "VDD14": false,
+    "VDD2": false,
+    "VDD3": true,
+    "VDD4": true,
+    "VDD5": false,
+    "VDD6": false,
+    "VDD7": false,
+    "VDD8": false,
+    "VDD9": false
+  },
+  "ViewCenterX": -54.59772067901622,
+  "ViewCenterY": -5844.952282407408,
+  "ZoomLevel": 0.14707521194831755,
+  "BoardParams": {
+    "PlaneResistivity": 1.72E-08,
+    "PlaneThickness": 3.5E-05,
+    "ProbeSeriesR": 0,
+    "ProbeSeriesL": 0,
+    "ProbeParallelC": 0
+  },
+  "Probes": [
+    {
+      "X": -1669.417763117288,
+      "Y": -3628.6712675308645,
+      "Domain": "VDD3"
+    },
+    {
+      "X": -1200.2700455246954,
+      "Y": -3628.6712675308645,
+      "Domain": "VDD3"
+    },
+    {
+      "X": 880.2980933641938,
+      "Y": -3635.470509814815,
+      "Domain": "VDD3"
+    },
+    {
+      "X": 1118.271573302466,
+      "Y": -3628.6712675308645,
+      "Domain": "VDD4"
+    }
+  ],
+  "Capacitors": [
+    {
+      "X": -1771.4063973765474,
+      "Y": -5008.91745117284,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD3",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        1384.0091072591633,
+        1493.7457145929757,
+        2986.2841805394755
+      ]
+    },
+    {
+      "X": -1173.0730763888928,
+      "Y": -5022.515935740741,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD3",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        1479.5813621226139,
+        1394.1099792438454,
+        2477.9483800828443
+      ]
+    },
+    {
+      "X": 50.79053472221858,
+      "Y": -5022.515935740741,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD3",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        2214.027901146007,
+        1872.953692578876,
+        1616.1614410157802
+      ]
+    },
+    {
+      "X": 689.9193094135771,
+      "Y": -5022.515935740741,
+      "Name": "500-10171-CL03A105MP3NSN_Series_Precise_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10171\\500-10171-CL03A105MP3NSN_Series_Precise_DC0V_25degC.s2p",
+      "DomainName": "VDD3",
+      "FitR": 0.009573647954014478,
+      "FitL": 2.0783069389838398E-10,
+      "FitC": 7.735495426429415E-07,
+      "ResonanceFreq": 12552239.612069,
+      "ProbeDistances": [
+        2740.3055269286333,
+        2348.5354493000664,
+        1400.0496758903053
+      ]
+    },
+    {
+      "X": -1751.0086705246956,
+      "Y": -6157.989397160495,
+      "Name": "500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-11067\\500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "DomainName": "VDD3",
+      "FitR": 0.009798469384736158,
+      "FitL": 2.51482941728003E-10,
+      "FitC": 1.7440218117670715E-06,
+      "ResonanceFreq": 7599585.573028191,
+      "ProbeDistances": [
+        2530.633769838041,
+        2588.5832484082916,
+        3645.1168462345768
+      ]
+    },
+    {
+      "X": 1295.0518726851815,
+      "Y": -5022.515935740741,
+      "Name": "500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-11067\\500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "DomainName": "VDD4",
+      "FitR": 0.009798469384736158,
+      "FitL": 2.51482941728003E-10,
+      "FitC": 1.7440218117670715E-06,
+      "ResonanceFreq": 7599585.573028191,
+      "ProbeDistances": [
+        1405.010403287799
+      ]
+    },
+    {
+      "X": 1886.5859513888854,
+      "Y": -5008.91745117284,
+      "Name": "500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-11067\\500-11067-GRM033R60J225ME15_DC0V_25degC.s2p",
+      "DomainName": "VDD4",
+      "FitR": 0.009798469384736158,
+      "FitL": 2.51482941728003E-10,
+      "FitC": 1.7440218117670715E-06,
+      "ResonanceFreq": 7599585.573028191,
+      "ProbeDistances": [
+        1579.6792430846708
+      ]
+    },
+    {
+      "X": 1301.8511149691321,
+      "Y": -6137.591670308643,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD4",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        2515.627761731285
+      ]
+    },
+    {
+      "X": 1927.3814050925894,
+      "Y": -6157.989397160495,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD4",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        2655.580712532115
+      ]
+    },
+    {
+      "X": 655.9230979938234,
+      "Y": -6654.334083888891,
+      "Name": "500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "FilePath": "D:\\OneDrive\\Visual_Studio_Code\\GV_SP_Utility\\Filetest\\500-10189\\500-10189-GRM033C71C104KE14_DC0V_25degC.s2p",
+      "DomainName": "VDD4",
+      "FitR": 0.03479065730847094,
+      "FitL": 2.2560214056673419E-10,
+      "FitC": 7.738379120476774E-08,
+      "ResonanceFreq": 38091100.67471375,
+      "ProbeDistances": [
+        3060.7844731231585
+      ]
+    }
+  ]
+}
